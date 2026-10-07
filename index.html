@@ -26,6 +26,7 @@
       font-size: 24px;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -39,6 +40,9 @@
 <p id="message"></p>
 
   <!-- The curtain that appears when you are idle -->
+  <h3>Scan with your phone to control this session:</h3>
+<div id="qrcode"></div>
+<p>Session ID: <b id="sessionId"></b></p>
   <div id="blurLayer">
     🔒 Screen locked for your privacy.<br>
     Move the mouse or press a key to unlock.
@@ -94,7 +98,14 @@
 
     logoutBtn.addEventListener("click", logOut);
     restoreDraft();
+var sessionId = Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("sessionId").innerText = sessionId;
+
+var phoneLink = "https://muriukiann.github.io/LabSentry/phone.html?session=" + sessionId;
+
+    new QRCode(document.getElementById("qrcode"), phoneLink);
     resetTimer();
+
   </script>
 </body>
 </html>
