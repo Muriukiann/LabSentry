@@ -33,7 +33,10 @@
   <p>Welcome, Student. Your grades: <b>Math: A, IT: B+</b></p>
 
   <h3>Type your essay here:</h3>
-  <textarea rows="8" cols="50"></textarea>
+<textarea id="essay" rows="8" cols="50"></textarea>
+<br><br>
+<button id="logoutBtn">Log Out Now</button>
+<p id="message"></p>
 
   <!-- The curtain that appears when you are idle -->
   <div id="blurLayer">
@@ -67,6 +70,30 @@
     document.addEventListener("touchstart", resetTimer);
 
     // 6. Start the countdown when the page opens
+       var essay = document.getElementById("essay");
+    var logoutBtn = document.getElementById("logoutBtn");
+    var message = document.getElementById("message");
+
+    function saveDraft() {
+      localStorage.setItem("labsentryDraft", essay.value);
+    }
+
+    function logOut() {
+      saveDraft();
+      essay.value = "";
+      message.innerText = "You are logged out. Your draft was saved safely.";
+    }
+
+    function restoreDraft() {
+      var saved = localStorage.getItem("labsentryDraft");
+      if (saved) {
+        essay.value = saved;
+        message.innerText = "Welcome back! Your draft was restored.";
+      }
+    }
+
+    logoutBtn.addEventListener("click", logOut);
+    restoreDraft();
     resetTimer();
   </script>
 </body>
