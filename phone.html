@@ -24,6 +24,7 @@
   </style>
 </head>
 
+
 <body>
   <h1>LabSentry Remote</h1>
   <p>Controlling session: <b id="sessionId"></b></p>
@@ -32,18 +33,41 @@
   <button id="logoutBtn">Log Out Now</button>
   <p id="status"></p>
 
+ 
+     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
-    // Read the session number from the link
+    var firebaseConfig = {
+      apiKey: "AIzaSyDUuVcKKcdrUm3lCodgxmjaSmhUaYKresY",
+      authDomain: "labsentry.firebaseapp.com",
+      databaseURL: "https://labsentry-default-rtdb.firebaseio.com",
+      projectId: "labsentry",
+      storageBucket: "labsentry.firebasestorage.app",
+      messagingSenderId: "1080139689955",
+      appId: "1:1080139689955:web:3c66b8dc3fe7353533fad6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+
     var params = new URLSearchParams(window.location.search);
-    document.getElementById("sessionId").innerText = params.get("session");
+    var session = params.get("session");
+    document.getElementById("sessionId").innerText = session;
+    var status = document.getElementById("status");
+
+    function sendCommand(action) {
+      db.ref("sessions/" + session + "/command")
+        .set({ action: action, time: Date.now() })
+        .then(function () { status.innerText = "Sent: " + action; })
+        .catch(function (e) { status.innerText = "Error: " + e.message; });
+    }
 
     document.getElementById("lockBtn").addEventListener("click", function () {
-      document.getElementById("status").innerText = "Lock button pressed (not connected yet).";
+      sendCommand("lock");
     });
-
     document.getElementById("logoutBtn").addEventListener("click", function () {
-      document.getElementById("status").innerText = "Logout button pressed (not connected yet).";
+      sendCommand("logout");
     });
+  
   </script>
 </body>
 </html>

@@ -27,6 +27,8 @@
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 
 <body>
@@ -62,7 +64,10 @@
     }
 
     // 4. Hide the curtain and restart the countdown
+       var remoteLocked = false;
+
     function resetTimer() {
+      if (remoteLocked) return;
       blurLayer.style.display = "none";
       clearTimeout(timer);
       timer = setTimeout(lockScreen, waitTime);
@@ -104,6 +109,51 @@ var sessionId = Math.floor(100000 + Math.random() * 900000);
 var phoneLink = "https://muriukiann.github.io/LabSentry/phone.html?session=" + sessionId;
 
     new QRCode(document.getElementById("qrcode"), phoneLink);
+        // 16. Connect to Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyDUuVcKKcdrUm3lCodgxmjaSmhUaYKresY",
+      authDomain: "labsentry.firebaseapp.com",
+      databaseURL: "https://labsentry-default-rtdb.firebaseio.com",
+      projectId: "labsentry",
+      storageBucket: "labsentry.firebasestorage.app",
+      messagingSenderId: "1080139689955",
+      appId: "1:1080139689955:web:3c66b8dc3fe7353533fad6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    var commandRef = db.ref("sessions/" + sessionId + "/command");
+
+    // 17. Clear any old command
+    commandRef.set(null);
+    var originalText = blurLayer.innerHTML;
+
+    // 18. Watch for commands from the phone
+    commandRef.on("value", function (snapshot) {
+      var cmd = snapshot.val();
+      if (!cmd) return;
+
+      if (cmd.action === "lock") {
+        remoteLocked = true;
+        blurLayer.innerHTML = "🔒 Locked from your phone.<br>Click anywhere to unlock.";
+        lockScreen();
+      }
+
+      if (cmd.action === "logout") {
+        logOut();
+        remoteLocked = true;
+        blurLayer.innerHTML = "🔒 Logged out from your phone. Your draft was saved.<br>Click anywhere to continue.";
+        lockScreen();
+      }
+    });
+
+    // 19. Click the curtain to unlock after a remote lock
+    blurLayer.addEventListener("click", function () {
+      if (remoteLocked) {
+        remoteLocked = false;
+        blurLayer.innerHTML = originalText;
+        resetTimer();
+      }
+    });
     resetTimer();
 
   </script>
