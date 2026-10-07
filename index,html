@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LabSentry</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 30px;
+      background: #f4f6f8;
+    }
+
+    /* The blurry curtain. It is hidden until we need it. */
+    #blurLayer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      text-align: center;
+      padding-top: 200px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Student Portal (Demo)</h1>
+  <p>Welcome, Student. Your grades: <b>Math: A, IT: B+</b></p>
+
+  <h3>Type your essay here:</h3>
+  <textarea rows="8" cols="50"></textarea>
+
+  <!-- The curtain that appears when you are idle -->
+  <div id="blurLayer">
+    🔒 Screen locked for your privacy.<br>
+    Move the mouse or press a key to unlock.
+  </div>
+
+  <script>
+    // 1. Set the waiting time (10 seconds for testing)
+    var waitTime = 10000; // 1000 = 1 second
+    var timer;
+
+    // 2. Get the blur curtain
+    var blurLayer = document.getElementById("blurLayer");
+
+    // 3. Show the curtain
+    function lockScreen() {
+      blurLayer.style.display = "block";
+    }
+
+    // 4. Hide the curtain and restart the countdown
+    function resetTimer() {
+      blurLayer.style.display = "none";
+      clearTimeout(timer);
+      timer = setTimeout(lockScreen, waitTime);
+    }
+
+    // 5. Watch for any activity
+    document.addEventListener("mousemove", resetTimer);
+    document.addEventListener("keydown", resetTimer);
+    document.addEventListener("touchstart", resetTimer);
+
+    // 6. Start the countdown when the page opens
+    resetTimer();
+  </script>
+</body>
+</html>
